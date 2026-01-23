@@ -40,16 +40,30 @@ export const Workspace: React.FC = () => {
   } = useWorkspace();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
 
   // Check if user is logged in (Firebase auth)
   useEffect(() => {
     const unsubscribe = subscribeToAuth((user) => {
+      setAuthChecked(true);
       if (!user) {
         navigate('/login');
       }
     });
     return () => unsubscribe();
   }, [navigate]);
+
+  // Show loading state while checking authentication
+  if (!authChecked) {
+    return (
+      <div className="flex h-screen bg-white dark:bg-[#1e1e1e] items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Handle keyboard shortcuts
   useEffect(() => {
