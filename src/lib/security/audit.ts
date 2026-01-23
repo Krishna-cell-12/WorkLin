@@ -98,13 +98,20 @@ export const logAction = async (options: AuditLogOptions): Promise<void> => {
       actorRole: options.actorRole || 'user',
     });
     } catch (funcError: any) {
-      // Functions not deployed or unavailable - silently fail (optional feature)
+      // Functions not deployed, CORS issues, or unavailable - silently fail (optional feature)
       // We log to debug but don't crash the app, as audit logging is auxiliary
-      if (funcError.code === 'functions/not-found' || funcError.message?.includes('not found')) {
-        console.debug('Audit logging function not available (optional feature)');
+      if (
+        funcError.code === 'functions/not-found' || 
+        funcError.message?.includes('not found') ||
+        funcError.code === 'functions/internal' ||
+        funcError.message?.includes('CORS') ||
+        funcError.message?.includes('Access-Control-Allow-Origin')
+      ) {
+        console.debug('Audit logging function not available (optional feature):', funcError.message);
         return;
       }
-      throw funcError;
+      // Only log other errors, don't throw
+      console.debug('Audit logging failed (non-critical):', funcError.message);
     }
   } catch (error: any) {
     console.error('Failed to log audit event:', error);

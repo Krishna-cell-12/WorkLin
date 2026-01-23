@@ -44,16 +44,19 @@ export const Workspace: React.FC = () => {
 
   // Check if user is logged in (Firebase auth)
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    let isMounted = true;
+    
     // Check current user immediately (synchronous check)
     const currentUser = getCurrentUser();
-    if (currentUser) {
+    if (currentUser && isMounted) {
       setAuthChecked(true);
     }
     
-    let timeoutId: NodeJS.Timeout;
-    
     // Also subscribe to auth changes (for logout/login events)
     const unsubscribe = subscribeToAuth((user) => {
+      if (!isMounted) return;
+      
       setAuthChecked(true);
       if (timeoutId) clearTimeout(timeoutId);
       if (!user) {
@@ -64,17 +67,18 @@ export const Workspace: React.FC = () => {
     // Fallback timeout - if auth doesn't respond in 2 seconds, proceed anyway
     // This prevents infinite loading if Firebase has issues
     timeoutId = setTimeout(() => {
-      if (!authChecked) {
-        console.warn('Auth check timeout - proceeding anyway');
-        setAuthChecked(true);
-        // If no user after timeout, redirect to login
-        if (!getCurrentUser()) {
-          navigate('/login');
-        }
+      if (!isMounted) return;
+      
+      const userAfterTimeout = getCurrentUser();
+      setAuthChecked(true);
+      // If no user after timeout, redirect to login
+      if (!userAfterTimeout) {
+        navigate('/login');
       }
     }, 2000);
     
     return () => {
+      isMounted = false;
       unsubscribe();
       if (timeoutId) clearTimeout(timeoutId);
     };
