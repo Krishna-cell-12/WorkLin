@@ -1,3 +1,4 @@
+// src/lib/firebase/database.ts
 import {
   collection,
   doc,
@@ -18,6 +19,21 @@ import { db } from './config';
 import { Page, Block, Workspace } from '../../types/workspace';
 import { addToQueue } from '../offline/queue';
 
+/**
+ * Firestore Database Access Layer (DAL)
+ * * This module handles all direct interactions with Firebase Firestore.
+ * * Key Features:
+ * 1. CRUD Operations: Wrappers for basic Firestore actions.
+ * 2. Real-time Subscriptions: onSnapshot wrappers for live UI updates.
+ * 3. Offline Support: Intercepts block operations when offline and sends them 
+ * to the IndexedDB queue (via `addToQueue`) for later synchronization.
+ * * Collections Structure:
+ * - workspaces/
+ * - pages/ (contains metadata, parent references)
+ * - blocks/ (contains actual content, linked by pageId)
+ */
+
+// Collection Constants
 // Firestore CRUD helpers for the core Workspace/Page/Block model.
 //
 // Collections:
@@ -33,7 +49,13 @@ const WORKSPACES_COLLECTION = 'workspaces';
 const PAGES_COLLECTION = 'pages';
 const BLOCKS_COLLECTION = 'blocks';
 
-// Workspace operations
+// ==========================================
+// WORKSPACE OPERATIONS
+// ==========================================
+
+/**
+ * Creates a new workspace and sets the creator as the owner.
+ */
 export const createWorkspace = async (userId: string, workspaceData: Partial<Workspace>) => {
   try {
     const workspaceRef = doc(db, WORKSPACES_COLLECTION);
@@ -78,6 +100,10 @@ export const updateWorkspace = async (workspaceId: string, updates: Partial<Work
   }
 };
 
+/**
+ * Subscribes to real-time updates for a specific workspace.
+ * Used to update the UI immediately when workspace settings change.
+ */
 export const subscribeToWorkspace = (
   workspaceId: string,
   callback: (workspace: any) => void
@@ -90,7 +116,10 @@ export const subscribeToWorkspace = (
   });
 };
 
-// Page operations
+// ==========================================
+// PAGE OPERATIONS
+// ==========================================
+
 export const createPage = async (workspaceId: string, pageData: Partial<Page>) => {
   try {
     const pageRef = doc(collection(db, PAGES_COLLECTION));
@@ -122,6 +151,10 @@ export const getPage = async (pageId: string) => {
   }
 };
 
+/**
+ * Fetches all pages within a workspace, ordered by last update.
+ * Note: This does not construct the hierarchy tree; that is done client-side.
+ */
 export const getPagesByWorkspace = async (workspaceId: string) => {
   try {
     const q = query(
@@ -173,7 +206,7 @@ export const updatePage = async (pageId: string, updates: Partial<Page>) => {
   }
 };
 
-// Move page to trash (archive)
+// Move page to trash (soft delete)
 export const deletePage = async (pageId: string) => {
   try {
     const pageRef = doc(db, PAGES_COLLECTION, pageId);
@@ -203,7 +236,7 @@ export const restorePage = async (pageId: string) => {
   }
 };
 
-// Permanently delete page
+// Permanently delete page (hard delete)
 export const permanentlyDeletePage = async (pageId: string) => {
   try {
     await deleteDoc(doc(db, PAGES_COLLECTION, pageId));
@@ -222,7 +255,17 @@ export const subscribeToPage = (pageId: string, callback: (page: any) => void) =
   });
 };
 
-// Block operations
+// ==========================================
+// BLOCK OPERATIONS
+// ==========================================
+
+/**
+ * Creates a new block in a page.
+ * * OFFLINE HANDLING:
+ * If the user is offline, this operation generates a temporary ID,
+ * saves the action to the IndexedDB queue, and returns an "offline" success.
+ * This ensures the UI remains responsive even without a connection.
+ */
 export const createBlock = async (pageId: string, blockData: Partial<Block>) => {
   // Offline mode: return a temp block so the editor can keep moving.
   // The sync layer currently just replays the create, so callers should be ready
@@ -267,6 +310,11 @@ export const getBlocksByPage = async (pageId: string) => {
   }
 };
 
+/**
+ * Updates an existing block.
+ * * OFFLINE HANDLING:
+ * Similar to createBlock, if offline, queues the update.
+ */
 export const updateBlock = async (blockId: string, updates: Partial<Block>) => {
   // Offline updates are queued and treated as “best effort”.
   // This means conflicts are possible if the same block is edited on multiple devices.
@@ -300,6 +348,10 @@ export const deleteBlock = async (blockId: string) => {
   }
 };
 
+/**
+ * Batch update for multiple blocks (e.g., when reordering).
+ * Uses Firestore WriteBatch to ensure atomicity (all succeed or all fail).
+ */
 export const updateBlocksBatch = async (updates: Array<{ blockId: string; updates: Partial<Block> }>) => {
   try {
     const batch = writeBatch(db);
