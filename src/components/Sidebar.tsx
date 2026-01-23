@@ -12,13 +12,17 @@ import {
   Sun,
   BarChart2, // Added for Analytics icon
   RotateCcw, // Restore icon
-  Trash // Permanent delete icon
+  Trash, // Permanent delete icon
+  Layers, // Templates icon
+  LogOut // Logout icon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Page } from '../types/workspace';
 import { Template } from '../types/template';
 import { TemplateGallery } from './templates/TemplateGallery';
 import { motion, AnimatePresence } from 'framer-motion';
+import { signOut } from 'firebase/auth';
+import { auth } from '../lib/firebase/config';
 
 import { useToast } from '../hooks/use-toast';
 import { useDarkMode } from '../hooks/useDarkMode';
@@ -128,6 +132,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
     navigate('/app/settings');
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+        duration: 3000,
+      });
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Logout failed",
+        description: "There was an error logging out. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
   return (
     <>
       <AnimatePresence>
@@ -155,29 +179,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        <div className="p-3 space-y-2 border-b border-gray-200/50 dark:border-slate-800/50">
+        <div className="p-3 space-y-2 border-b border-gray-200 dark:border-gray-800">
           <button
             onClick={() => setShowTemplates(true)}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-slate-800 dark:hover:to-slate-800 rounded-xl transition-all group hover:scale-[1.02]"
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Plus size={16} className="text-white" />
-            </div>
+            <Plus size={18} />
             <span>New Page</span>
           </button>
           <button
             onClick={() => inputRef.current?.focus()}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-xl transition-all hover:scale-[1.02]"
+            className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
           >
-            <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-slate-800 flex items-center justify-center">
-              <Search size={16} className="text-gray-600 dark:text-gray-400" />
-            </div>
+            <Search size={18} />
             <span>Search</span>
-            <span className="ml-auto text-xs text-gray-400 bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded">⌘K</span>
+            <span className="ml-auto text-xs text-gray-400">⌘K</span>
           </button>
         </div>
 
-        <div className="p-3 pb-3 border-b border-gray-200/50 dark:border-slate-800/50">
+        <div className="p-3 border-b border-gray-200 dark:border-gray-800">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
@@ -186,7 +206,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               placeholder="Search pages..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:text-gray-100 placeholder:text-gray-400 transition-all"
+              className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-100 placeholder:text-gray-400"
             />
           </div>
         </div>
@@ -279,6 +299,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         key={page.id}
                         whileHover={{ x: 2 }}
                         className="group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800"
+                        onClick={() => onSelectPage(page.id)}
                       >
                         <span className="text-base flex-shrink-0 opacity-50">
                           {page.icon}
@@ -324,57 +345,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
                 {filteredPages.length === 0 ? (
                   <div className="text-center py-12 px-2">
-                    <div className="w-16 h-16 mx-auto rounded-2xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center mb-4">
-                      <FileText size={32} className="text-gray-400 dark:text-gray-600" />
-                  searchQuery ? (
-                    <EmptyState
-                      variant="compact"
-                      title="No pages found"
-                      description="Try a different search."
-                      actionLabel="Clear search"
-                      onAction={() => {
-                        setSearchQuery('');
-                        inputRef.current?.focus();
-                      }}
-                      icon={<FileText size={20} />}
-                    />
-                  ) : (
-                    <EmptyState
-                      variant="compact"
-                      title="No pages yet"
-                      description="Create your first page to get started."
-                      actionLabel="New Page"
-                      onAction={handleAddPage}
-                      icon={<FileText size={20} />}
-                    />
-                  )
-            ) : (
-              <div className="space-y-1">
-                {filteredPages.map((page) => (
-                  <motion.div
-                    key={page.id}
-                    whileHover={{ x: 2 }}
-                    className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all ${currentPageId === page.id
-                      ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-700 dark:text-blue-300 shadow-sm'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800'
-                      }`}
-                    onClick={() => onSelectPage(page.id)}
-                  >
-                    <div onClick={(e) => e.stopPropagation()}>
-                      <IconPicker onChange={(icon) => onUpdatePage?.(page.id, icon)}>
-                        <span className="text-base flex-shrink-0 hover:bg-gray-200 dark:hover:bg-gray-700 rounded p-0.5 transition-colors cursor-pointer">
-                          {page.icon}
-                        </span>
-                      </IconPicker>
-                    </div>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">{searchQuery ? 'No pages found' : 'No pages yet'}</p>
-                    {!searchQuery && (
-                      <button
-                        onClick={() => setShowTemplates(true)}
-                        className="mt-3 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                      >
-                        Create your first page
-                      </button>
+                    {searchQuery ? (
+                      <EmptyState
+                        variant="compact"
+                        title="No pages found"
+                        description="Try a different search."
+                        actionLabel="Clear search"
+                        onAction={() => {
+                          setSearchQuery('');
+                          inputRef.current?.focus();
+                        }}
+                        icon={<FileText size={20} />}
+                      />
+                    ) : (
+                      <EmptyState
+                        variant="compact"
+                        title="No pages yet"
+                        description="Create your first page to get started."
+                        actionLabel="New Page"
+                        onAction={() => handleCreatePage()}
+                        icon={<FileText size={20} />}
+                      />
                     )}
                   </div>
                 ) : (
@@ -436,9 +427,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Settings size={16} />
             <span>Settings</span>
           </button>
+
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2 px-2 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+          >
+            <LogOut size={16} />
+            <span>Logout</span>
+          </button>
         </div>
       </motion.aside>
-
 
       <TemplateGallery
         isOpen={showTemplates}

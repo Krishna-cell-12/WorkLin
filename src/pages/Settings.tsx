@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Bell, Shield, Palette, Database, Globe, Save, Users, Share2 } from 'lucide-react';
+import { ArrowLeft, User, Bell, Shield, Palette, Database, Globe, Save, Users, Share2, LogOut } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { useToast } from '../hooks/use-toast';
+import { signOut } from 'firebase/auth';
+import { auth } from '../lib/firebase/config';
 
 import { ShareDialog } from '../components/workspace/ShareDialog';
 import { MembersList } from '../components/workspace/MembersList';
@@ -16,11 +18,11 @@ export const Settings: React.FC = () => {
   const [notifications, setNotifications] = useState(true);
   const [autoSave, setAutoSave] = useState(true);
   const [language, setLanguage] = useState('en');
-  
+
   // Workspace sharing state
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [membersRefreshTrigger, setMembersRefreshTrigger] = useState(0);
-  
+
   // These would come from your workspace context/store in production
   const currentWorkspaceId = 'default'; // Replace with actual workspace ID
   const currentUserId = 'local-user'; // Replace with actual user ID
@@ -47,6 +49,26 @@ export const Settings: React.FC = () => {
     setMembersRefreshTrigger(prev => prev + 1);
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+        duration: 3000,
+      });
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast({
+        title: "Logout failed",
+        description: "There was an error logging out. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#1e1e1e]">
       {/* Header */}
@@ -62,7 +84,7 @@ export const Settings: React.FC = () => {
               <ArrowLeft size={18} />
               Back
             </Button>
-            
+
           </div>
           <Button onClick={handleSave} className="gap-2">
             <Save size={18} />
@@ -273,6 +295,27 @@ export const Settings: React.FC = () => {
                 <option value="de">Deutsch</option>
                 <option value="zh">中文</option>
               </select>
+            </CardContent>
+          </Card>
+
+          {/* Logout Section */}
+          <Card className="border-red-200 dark:border-red-900/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                <LogOut className="h-5 w-5" />
+                Logout
+              </CardTitle>
+              <CardDescription>Sign out of your account</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="destructive"
+                onClick={handleLogout}
+                className="gap-2"
+              >
+                <LogOut size={18} />
+                Logout from WorkLin
+              </Button>
             </CardContent>
           </Card>
         </div>

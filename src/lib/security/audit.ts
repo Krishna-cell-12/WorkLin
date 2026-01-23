@@ -92,11 +92,11 @@ export const logAction = async (options: AuditLogOptions): Promise<void> => {
 
     // Check if functions are available (optional feature)
     try {
-      await logAuditEventCallable({
-        ...options,
-        status: options.status || 'SUCCESS',
-        actorRole: options.actorRole || 'user',
-      });
+    await logAuditEventCallable({
+      ...options,
+      status: options.status || 'SUCCESS',
+      actorRole: options.actorRole || 'user',
+    });
     } catch (funcError: any) {
       // Functions not deployed or unavailable - silently fail (optional feature)
       // We log to debug but don't crash the app, as audit logging is auxiliary

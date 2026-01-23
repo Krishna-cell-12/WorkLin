@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { PageEditor } from '../components/PageEditor';
-import { FullTextSearch } from '../components/search/FullTextSearch';
+import { AdvancedSearch } from '../components/search/AdvancedSearch';
 import { AnalyticsDashboard } from '../components/analytics/Dashboard';
 import { WebhookManager } from '../components/integrations/WebhookManager';
 import { useWorkspace } from '../hooks/useWorkspace';
@@ -26,6 +26,7 @@ export const Workspace: React.FC = () => {
     currentPageId,
     setCurrentPageId,
     addPage,
+    addPageFromTemplate,
     deletePage,
     restorePage,
     permanentlyDeletePage,
@@ -99,11 +100,13 @@ export const Workspace: React.FC = () => {
             navigate('/app');
           }
         }}
-        onAddPage={(template) => addPage(
-          template?.content.title || undefined,
-          template?.icon || undefined,
-          template?.content.blocks
-        )}
+        onAddPage={(template) => {
+          if (template) {
+            addPageFromTemplate(template);
+          } else {
+            addPage();
+          }
+        }}
         onDeletePage={(pageId) => {
           if (confirm('Are you sure you want to move this page to trash?')) {
             deletePage(pageId);
@@ -123,7 +126,7 @@ export const Workspace: React.FC = () => {
       {/* Main Content Area */}
       {isSearchView ? (
         <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#1e1e1e] p-8">
-          <FullTextSearch />
+          <AdvancedSearch />
         </div>
       ) : isWebhooksView ? (
         <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#1e1e1e] p-8">
@@ -138,15 +141,7 @@ export const Workspace: React.FC = () => {
         // Standard Page Editor View
         <div className="flex-1 h-full overflow-hidden">
           {currentPage && (
-            <>
-              <div className="max-w-4xl mx-auto px-12 md:px-24 pt-12 pb-2">
-                <PageHeader
-                  page={currentPage}
-                  initialTitle={currentPage.title}
-                  onDelete={() => deletePage(currentPage.id)}
-                />
-              </div>
-
+            <div className="h-full">
               <PageEditor
                 page={currentPage}
                 allPages={workspace.pages}
@@ -167,7 +162,7 @@ export const Workspace: React.FC = () => {
                   updatePageProperties(pageId, updates.properties);
                 }}
               />
-            </>
+            </div>
           )}
           {!currentPage && !currentPageId && (
             <div className="flex-1 flex flex-col items-center justify-center h-full text-gray-400">

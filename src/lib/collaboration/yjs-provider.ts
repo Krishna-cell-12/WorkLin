@@ -26,17 +26,16 @@ export const createYjsProvider = (pageId: string) => {
   // 1. Create the Yjs document instance
   // This holds the shared data state locally and merges updates from peers
   const doc = new Y.Doc();
-  
+
   // Use environment variable for WebSocket URL, or disable collaboration if not configured
-  // This allows the app to work in "single-player" mode if no backend is set up
   const wsUrl = import.meta.env.VITE_YJS_WEBSOCKET_URL;
-  
+
   // If no WebSocket URL is configured, return a local-only doc (no collaboration)
   if (!wsUrl) {
-    console.warn('Yjs WebSocket URL not configured. Collaboration disabled. Set VITE_YJS_WEBSOCKET_URL in .env to enable.');
+    // Silent fallback for non-collaboration mode
     return { doc, provider: null };
   }
-  
+
   try {
     // 2. Initialize WebSocket Provider
     // Connects to the specific room `worklin-page-${pageId}`

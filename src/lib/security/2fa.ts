@@ -43,11 +43,11 @@ export const enable2FA = async (): Promise<{ secret: string; otpauthUrl: string 
   }
 
   try {
-    const result = await generate2FASecretCallable();
-    return {
-      secret: result.data.secret,
-      otpauthUrl: result.data.otpauthUrl,
-    };
+  const result = await generate2FASecretCallable();
+  return {
+    secret: result.data.secret,
+    otpauthUrl: result.data.otpauthUrl,
+  };
   } catch (error: any) {
     if (error.code === 'functions/not-found' || error.message?.includes('not found')) {
       throw new Error('2FA feature requires Firebase Functions to be deployed. This is an optional security feature.');
@@ -69,8 +69,8 @@ export const verify2FA = async (code: string, secret: string): Promise<boolean> 
   }
 
   try {
-    const result = await verify2FATokenCallable({ code, secret });
-    return result.data.valid;
+  const result = await verify2FATokenCallable({ code, secret });
+  return result.data.valid;
   } catch (error: any) {
     if (error.code === 'functions/not-found' || error.message?.includes('not found')) {
       throw new Error('2FA feature requires Firebase Functions to be deployed. This is an optional security feature.');
@@ -90,8 +90,8 @@ export const disable2FA = async (code: string): Promise<boolean> => {
   }
 
   try {
-    const result = await disable2FACallable({ code });
-    return result.data.success;
+  const result = await disable2FACallable({ code });
+  return result.data.success;
   } catch (error: any) {
     if (error.code === 'functions/not-found' || error.message?.includes('not found')) {
       throw new Error('2FA feature requires Firebase Functions to be deployed. This is an optional security feature.');
