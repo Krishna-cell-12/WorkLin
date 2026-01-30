@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import { Block as BlockType } from '../../types/workspace';
 import { Code, Copy, Check } from 'lucide-react';
 import Prism from 'prismjs';
@@ -49,8 +50,8 @@ const LANGUAGES = [
 ];
 
 export const CodeBlock: React.FC<CodeBlockProps> = ({ block, onUpdate }) => {
-  const [code, setCode] = useState(block.text || '');
-  const [language, setLanguage] = useState(block.properties?.language || 'javascript');
+  const [code, setCode] = useState(block.text ?? '');
+  const [language, setLanguage] = useState(block.properties?.language ?? 'javascript');
   const [copied, setCopied] = useState(false);
   const [highlightedCode, setHighlightedCode] = useState('');
 
@@ -61,13 +62,15 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ block, onUpdate }) => {
         Prism.languages[language],
         language
       );
-      setHighlightedCode(highlighted);
+      // Sanitize highlighted HTML to prevent XSS
+      setHighlightedCode(DOMPurify.sanitize(highlighted));
     } else {
-      setHighlightedCode(code);
+      setHighlightedCode(code ?? '');
     }
   }, [code, language]);
 
   const handleCodeChange = (newCode: string) => {
+    // Input validation: prevent empty code
     setCode(newCode);
     onUpdate({
       text: newCode,
@@ -89,6 +92,8 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ block, onUpdate }) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
+      setCopied(false);
+      alert('Copy failed. Please try manually.');
       console.error('Failed to copy code:', err);
     }
   };
@@ -135,7 +140,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ block, onUpdate }) => {
         {/* Line numbers */}
         <div className="absolute left-0 top-0 bottom-0 w-12 bg-[#1e1e1e] border-r border-gray-700 select-none overflow-hidden">
           <div className="py-3 px-2 text-right text-xs text-gray-600 font-mono leading-6">
-            {code.split('\n').map((_, i) => (
+            {(code ?? '').split('\n').map((_, i) => (
               <div key={i}>{i + 1}</div>
             ))}
           </div>

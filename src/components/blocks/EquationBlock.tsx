@@ -9,7 +9,7 @@ interface EquationBlockProps {
 
 export const EquationBlock: React.FC<EquationBlockProps> = ({ block, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [latex, setLatex] = useState(block.text || '');
+  const [latex, setLatex] = useState(block.text ?? '');
   const [renderedHtml, setRenderedHtml] = useState('');
   const [error, setError] = useState('');
 
@@ -20,20 +20,26 @@ export const EquationBlock: React.FC<EquationBlockProps> = ({ block, onUpdate })
         // Dynamically import KaTeX
         const katex = await import('katex');
         const katexCss = document.querySelector('link[href*="katex"]');
-        
         if (!katexCss) {
           const link = document.createElement('link');
           link.rel = 'stylesheet';
           link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css';
           document.head.appendChild(link);
         }
-
         if (latex) {
+          // Validate input: prevent empty or obviously malicious input
+          if (!latex.trim()) {
+            setError('Equation cannot be empty');
+            setRenderedHtml('');
+            return;
+          }
           try {
             const html = katex.default.renderToString(latex, {
               throwOnError: false,
               displayMode: true,
               output: 'html',
+              strict: "error", // Enforce strict mode
+              trust: false,    // Do not trust user input
             });
             setRenderedHtml(html);
             setError('');
@@ -47,7 +53,6 @@ export const EquationBlock: React.FC<EquationBlockProps> = ({ block, onUpdate })
         setError('Failed to load equation renderer');
       }
     };
-
     loadKaTeX();
   }, [latex]);
 

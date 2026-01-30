@@ -1,3 +1,6 @@
+// VitePWA injectManifest placeholder
+self.__WB_MANIFEST;
+
 const CACHE_NAME = 'worklin-v1';
 const ASSETS_TO_CACHE = [
     '/',
