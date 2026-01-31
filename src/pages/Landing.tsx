@@ -1,11 +1,12 @@
-import React from 'react';import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  Zap, 
-  Shield, 
-  Users, 
-  Github, 
-  Moon, 
+import React from 'react';
+import { Link } from 'react-router-dom';
+import {
+  ArrowRight,
+  Zap,
+  Shield,
+  Users,
+  Github,
+  Moon,
   Sun,
   Layout,
   Database,
@@ -28,22 +29,25 @@ import { motion } from 'framer-motion';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { Logo, LogoIcon } from '../components/Logo';
 
-// The Landing page is the first thing users see. 
-// It features a hero section with a call to action, feature highlights, and a footer.
-const BentoCard = ({ 
-  icon: Icon, 
-  title, 
-  description, 
-  className = "", 
+/**
+ * BentoCard Component
+ * A reusable card component for the feature grid section.
+ * Uses a "bento box" style layout with an icon, title, description, and optional children.
+ */
+const BentoCard = ({
+  icon: Icon,
+  title,
+  description,
+  className = "",
   delay = 0,
-  children 
-}: { 
-  icon: LucideIcon, 
-  title: string, 
-  description: string, 
-  className?: string, 
+  children
+}: {
+  icon: LucideIcon,
+  title: string,
+  description: string,
+  className?: string,
   delay?: number,
-  children?: React.ReactNode 
+  children?: React.ReactNode
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -70,6 +74,11 @@ const BentoCard = ({
   </motion.div>
 );
 
+/**
+ * FeatureItem Component
+ * A small component that displays a checkmark icon next to a feature label.
+ * Used within BentoCard to list out specific features.
+ */
 const FeatureItem = ({ text }: { text: string }) => (
   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
     <CheckCircle2 className="w-4 h-4 text-blue-500" />
@@ -77,63 +86,35 @@ const FeatureItem = ({ text }: { text: string }) => (
   </div>
 );
 
+/**
+ * Landing Component
+ * The main landing page for the WorkLin application.
+ * It includes a header, hero section, feature highlights, workflow visualization,
+ * insights section, tech stack, FAQ, CTA, and footer.
+ */
 export const Landing: React.FC = () => {
   const { isDark, toggleDarkMode } = useDarkMode();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      {/* Header: Contains Logo, Dark Mode toggle, GitHub link, and Login button */}
-      <header className="container mx-auto px-6 py-6 flex items-center justify-between backdrop-blur-sm bg-white/80 dark:bg-slate-900/80 sticky top-0 z-50 border-b border-gray-200/50 dark:border-slate-800/50">
-        <Logo size={44} />
-        <div className="flex items-center gap-3">
-          <button
-            onClick={toggleDarkMode}
-            className="p-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all hover:scale-105"
-            aria-label="Toggle dark mode"
-          >
-            {isDark ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <a
-            href="https://github.com/fyiclub-vitb/WorkLin"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all hover:scale-105"
-          >
-            <Github size={18} />
-            <span className="hidden sm:inline font-medium">GitHub</span>
-          </a>
-          <Link
-            to="/login"
-            className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl transition-all font-semibold shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105"
-          >
-            Get Started
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen bg-white dark:bg-slate-950 selection:bg-blue-500/30 overflow-x-hidden">
+      {/* Header - Fixed navigation bar with logo, nav links, and controls */}
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 dark:border-slate-800/50 backdrop-blur-xl bg-white/60 dark:bg-slate-950/60">
+        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+          <Logo size={36} />
 
-      {/* Hero Section: The main headline and primary call-to-action */}
-      <section className="container mx-auto px-6 py-24 md:py-32 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium mb-8">
-            <Zap size={16} className="text-blue-600 dark:text-blue-400" />
-            Open Source • Free Forever
-          </div>
-          <h1 className="text-6xl md:text-8xl font-extrabold text-gray-900 dark:text-white mb-6 leading-tight">
-            Your workspace,
-            <br />
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              reimagined
-            </span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-            WorkLin is an open-source Notion alternative. Create pages, organize your thoughts,
-            and collaborate with your team—all in one beautiful workspace.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors">Features</a>
+            <a href="#workflow" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors">Workflow</a>
+            <a href="https://github.com/fyiclub-vitb/WorkLin" className="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors">Open Source</a>
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <button
+              onClick={toggleDarkMode}
+              className="p-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-white/20 dark:hover:bg-slate-900/50 backdrop-blur-lg transition-colors border border-transparent hover:border-white/10"
+            >
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <Link
               to="/login"
               className="hidden sm:block px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-500/20"
@@ -141,30 +122,18 @@ export const Landing: React.FC = () => {
               Get Started
             </Link>
           </div>
-        </motion.div>
-      </section>
-
-      {/* Features Section: Highlights key capabilities like 'Lightning Fast' and 'Privacy First' */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Everything you need to stay organized
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400">
-            Powerful features, beautiful design, open source
-          </p>
         </div>
       </header>
 
       <main>
-        {/* Hero Section */}
+        {/* Hero Section - Main headline and primary call-to-action */}
         <section className="relative pt-40 pb-20 md:pt-56 md:pb-40 overflow-hidden bg-white dark:bg-slate-950">
-          {/* Technical Canvas Background */}
+          {/* Technical Canvas Background with grid and decorative elements */}
           <div className="absolute inset-0 z-0 pointer-events-none">
             {/* Refined Large Grid */}
-            <div 
+            <div
               className="absolute inset-0 opacity-[0.05] dark:opacity-[0.1]"
-              style={{ 
+              style={{
                 backgroundImage: `
                   linear-gradient(to right, #94a3b8 1px, transparent 1px),
                   linear-gradient(to bottom, #94a3b8 1px, transparent 1px)
@@ -173,28 +142,28 @@ export const Landing: React.FC = () => {
               }}
             />
 
-            {/* Top Spotlight */}
-            <div 
+            {/* Top Spotlight - Blue gradient glow */}
+            <div
               className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[800px]"
               style={{
                 background: 'radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.1), transparent 70%)'
               }}
             />
 
-            {/* Corner Brackets */}
+            {/* Corner Brackets - Decorative frame elements */}
             <div className="absolute inset-x-6 inset-y-12 md:inset-x-20 md:inset-y-24 border-slate-200/50 dark:border-slate-800/50 pointer-events-none">
               <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-slate-200 dark:border-slate-800" />
               <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-slate-200 dark:border-slate-800" />
               <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-slate-200 dark:border-slate-800" />
               <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-slate-200 dark:border-slate-800" />
-              
-              {/* Metadata Labels */}
+
+              {/* Metadata Labels - Status and version info in corners */}
               <div className="absolute top-2 left-2 flex items-center gap-2">
                 <div className="w-1 h-1 rounded-full bg-blue-500 animate-pulse" />
                 <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600 uppercase tracking-widest">System Ready</span>
               </div>
               <div className="absolute top-2 right-2">
-                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600 uppercase tracking-widest">v1.0.4-stable</span>
+                <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600 uppercase tracking-widest">v0.0.1-stable</span>
               </div>
               <div className="absolute bottom-2 left-2">
                 <span className="text-[10px] font-mono text-slate-400 dark:text-slate-600 uppercase tracking-widest">Build: 2024.01</span>
@@ -229,7 +198,7 @@ export const Landing: React.FC = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-12 max-w-3xl mx-auto leading-relaxed font-medium"
             >
-              The unified, open-source workspace that combines notes, tasks, and data. 
+              The unified, open-source workspace that combines notes, tasks, and data.
               Built for speed, privacy, and seamless collaboration.
             </motion.p>
 
@@ -259,7 +228,7 @@ export const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* Why WorkLin? Section */}
+        {/* Why WorkLin? Section - Three key value propositions */}
         <section className="py-24 border-y border-white/10 dark:border-slate-800/50 bg-slate-50/10 dark:bg-slate-900/10 backdrop-blur-sm">
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -294,7 +263,7 @@ export const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* Features Grid */}
+        {/* Features Grid - Bento-style cards showcasing main capabilities */}
         <section id="features" className="py-32 bg-slate-50/50 dark:bg-slate-900/20">
           <div className="container mx-auto px-6">
             <div className="text-center max-w-3xl mx-auto mb-20">
@@ -384,13 +353,11 @@ export const Landing: React.FC = () => {
                   <FeatureItem text="Hotkeys" />
                 </div>
               </BentoCard>
-
-  
             </div>
           </div>
         </section>
 
-        {/* Workflow Section */}
+        {/* Workflow Section - Step-by-step breakdown with a visual mock UI */}
         <section id="workflow" className="py-32 overflow-hidden">
           <div className="container mx-auto px-6">
             <div className="flex flex-col lg:flex-row items-center gap-20">
@@ -431,7 +398,7 @@ export const Landing: React.FC = () => {
               </div>
               <div className="flex-1 relative group">
                 <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl border border-white/20 dark:border-slate-800/50 bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl p-6 md:p-8 transition-all duration-500 group-hover:shadow-blue-500/10 group-hover:border-blue-500/30">
-                  {/* Mock UI Header */}
+                  {/* Mock UI Header - Window controls and breadcrumb */}
                   <div className="flex items-center justify-between mb-8 border-b border-slate-200/50 dark:border-slate-800/50 pb-4">
                     <div className="flex items-center gap-3">
                       <div className="flex gap-1.5">
@@ -462,9 +429,9 @@ export const Landing: React.FC = () => {
                       <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Q1 Product Roadmap</h3>
                     </div>
 
-                    {/* Task List */}
+                    {/* Task List - Animated task items */}
                     <div className="space-y-3">
-                      <motion.div 
+                      <motion.div
                         initial={{ x: -20, opacity: 0 }}
                         whileInView={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.2 }}
@@ -479,7 +446,7 @@ export const Landing: React.FC = () => {
                         <div className="px-2.5 py-1 rounded-lg bg-white/50 dark:bg-slate-800/50 text-[10px] font-bold text-blue-600 dark:text-blue-400 border border-blue-500/10 uppercase tracking-wider">High</div>
                       </motion.div>
 
-                      <motion.div 
+                      <motion.div
                         initial={{ x: -20, opacity: 0 }}
                         whileInView={{ x: 0, opacity: 1 }}
                         transition={{ delay: 0.3 }}
@@ -493,9 +460,9 @@ export const Landing: React.FC = () => {
                       </motion.div>
                     </div>
 
-                    {/* Grid/Gallery Blocks */}
+                    {/* Grid/Gallery Blocks - Visual block previews */}
                     <div className="pt-6 border-t border-slate-200/50 dark:border-slate-800/50 grid grid-cols-2 gap-4">
-                      <motion.div 
+                      <motion.div
                         whileHover={{ scale: 1.02 }}
                         className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200/50 dark:from-slate-800 dark:to-slate-900/50 p-4 border border-white/20 dark:border-slate-700/50 relative overflow-hidden group/block"
                       >
@@ -511,7 +478,7 @@ export const Landing: React.FC = () => {
                         </div>
                       </motion.div>
 
-                      <motion.div 
+                      <motion.div
                         whileHover={{ scale: 1.02 }}
                         className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 p-4 border border-white/20 dark:border-slate-700/50 relative overflow-hidden group/block"
                       >
@@ -530,7 +497,7 @@ export const Landing: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Decorative Elements */}
+                {/* Decorative Elements - Glowing blur effects */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-600/10 blur-[100px] -z-10 animate-pulse" />
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-indigo-600/10 blur-[60px] -z-10" />
                 <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-600/10 blur-[60px] -z-10" />
@@ -539,7 +506,7 @@ export const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* Insights Section */}
+        {/* Insights Section - Search and analytics visualization */}
         <section className="py-32 bg-slate-50/50 dark:bg-slate-900/20">
           <div className="container mx-auto px-6">
             <div className="flex flex-col lg:flex-row-reverse items-center gap-20">
@@ -587,6 +554,7 @@ export const Landing: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-6">
+                      {/* Productivity Chart - Animated line graph */}
                       <div className="col-span-2 p-6 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-white/20 dark:border-slate-700/50 backdrop-blur-sm">
                         <div className="flex justify-between items-center mb-6">
                           <div className="flex items-center gap-2">
@@ -596,52 +564,53 @@ export const Landing: React.FC = () => {
                           <div className="text-[10px] font-bold text-blue-600 bg-blue-500/10 dark:bg-blue-900/40 px-2.5 py-1 rounded-full uppercase border border-blue-500/20">Weekly View</div>
                         </div>
                         <div className="relative h-32 w-full">
-                      <svg className="w-full h-full overflow-visible" viewBox="0 0 400 100" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-                            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
-                          </linearGradient>
-                        </defs>
-                        {/* Area Fill */}
-                        <motion.path
-                          initial={{ d: "M 0 100 Q 50 100 100 100 T 200 100 T 300 100 T 400 100 V 100 H 0 Z" }}
-                          whileInView={{ d: "M 0 80 Q 50 20 100 60 T 200 30 T 300 70 T 400 40 V 100 H 0 Z" }}
-                          transition={{ duration: 2, ease: "easeOut" }}
-                          fill="url(#chartGradient)"
-                        />
-                        {/* Line */}
-                        <motion.path
-                          initial={{ pathLength: 0 }}
-                          whileInView={{ pathLength: 1 }}
-                          transition={{ duration: 2, ease: "easeOut" }}
-                          d="M 0 80 Q 50 20 100 60 T 200 30 T 300 70 T 400 40"
-                          fill="none"
-                          stroke="#3b82f6"
-                          strokeWidth="3"
-                          strokeLinecap="round"
-                        />
-                        {/* Data Points */}
-                        {[
-                          { x: 0, y: 80 }, { x: 100, y: 60 }, { x: 200, y: 30 }, { x: 300, y: 70 }, { x: 400, y: 40 }
-                        ].map((point, i) => (
-                          <motion.circle
-                            key={i}
-                            initial={{ scale: 0 }}
-                            whileInView={{ scale: 1 }}
-                            transition={{ delay: 1 + i * 0.1 }}
-                            cx={point.x}
-                            cy={point.y}
-                            r="4"
-                            fill="white"
-                            stroke="#3b82f6"
-                            strokeWidth="2"
-                          />
-                        ))}
-                      </svg>
-                    </div>
+                          <svg className="w-full h-full overflow-visible" viewBox="0 0 400 100" preserveAspectRatio="none">
+                            <defs>
+                              <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
+                                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+                              </linearGradient>
+                            </defs>
+                            {/* Area Fill */}
+                            <motion.path
+                              initial={{ d: "M 0 100 Q 50 100 100 100 T 200 100 T 300 100 T 400 100 V 100 H 0 Z" }}
+                              whileInView={{ d: "M 0 80 Q 50 20 100 60 T 200 30 T 300 70 T 400 40 V 100 H 0 Z" }}
+                              transition={{ duration: 2, ease: "easeOut" }}
+                              fill="url(#chartGradient)"
+                            />
+                            {/* Line */}
+                            <motion.path
+                              initial={{ pathLength: 0 }}
+                              whileInView={{ pathLength: 1 }}
+                              transition={{ duration: 2, ease: "easeOut" }}
+                              d="M 0 80 Q 50 20 100 60 T 200 30 T 300 70 T 400 40"
+                              fill="none"
+                              stroke="#3b82f6"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                            />
+                            {/* Data Points */}
+                            {[
+                              { x: 0, y: 80 }, { x: 100, y: 60 }, { x: 200, y: 30 }, { x: 300, y: 70 }, { x: 400, y: 40 }
+                            ].map((point, i) => (
+                              <motion.circle
+                                key={i}
+                                initial={{ scale: 0 }}
+                                whileInView={{ scale: 1 }}
+                                transition={{ delay: 1 + i * 0.1 }}
+                                cx={point.x}
+                                cy={point.y}
+                                r="4"
+                                fill="white"
+                                stroke="#3b82f6"
+                                strokeWidth="2"
+                              />
+                            ))}
+                          </svg>
+                        </div>
                       </div>
-                      
+
+                      {/* Storage Indicator - Circular progress */}
                       <div className="p-6 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-white/20 dark:border-slate-700/50 backdrop-blur-sm">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="w-2.5 h-2.5 rounded-full bg-indigo-600" />
@@ -650,13 +619,13 @@ export const Landing: React.FC = () => {
                         <div className="relative w-16 h-16 mx-auto mb-4">
                           <svg className="w-full h-full transform -rotate-90">
                             <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-200/50 dark:text-slate-700/50" />
-                            <motion.circle 
-                              cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="8" fill="transparent" 
+                            <motion.circle
+                              cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="8" fill="transparent"
                               strokeDasharray="175.9"
                               initial={{ strokeDashoffset: 175.9 }}
                               whileInView={{ strokeDashoffset: 175.9 * (1 - 0.65) }}
                               transition={{ duration: 1.5, ease: "easeOut" }}
-                              className="text-indigo-600" 
+                              className="text-indigo-600"
                               strokeLinecap="round"
                             />
                           </svg>
@@ -664,6 +633,7 @@ export const Landing: React.FC = () => {
                         </div>
                       </div>
 
+                      {/* Growth Indicator */}
                       <div className="p-6 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-white/20 dark:border-slate-700/50 backdrop-blur-sm text-center flex flex-col items-center justify-center">
                         <div className="flex items-center gap-2 mb-4 w-full">
                           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
@@ -684,36 +654,34 @@ export const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* Tech Stack Section */}
+        {/* Tech Stack Section - Logos of technologies used */}
         <section className="py-24 bg-white dark:bg-slate-950">
           <div className="container mx-auto px-6 text-center">
             <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-12">
               Built with modern technology
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              Real-time collaboration coming soon. Share workspaces and work together seamlessly.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Open Source Section: Emphasizes the open-source nature of the project */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-3xl p-12 md:p-16 text-center text-white overflow-hidden">
-          <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-            className="relative z-10"
-          >
-            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <Code size={40} className="text-white" />
+            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+              <div className="flex items-center gap-2">
+                <Code className="w-6 h-6" />
+                <span className="font-bold text-xl">React</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Database className="w-6 h-6" />
+                <span className="font-bold text-xl">Firebase</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Layout className="w-6 h-6" />
+                <span className="font-bold text-xl">Tailwind</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Cpu className="w-6 h-6" />
+                <span className="font-bold text-xl">TypeScript</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* FAQ Section */}
+        {/* FAQ Section - Frequently asked questions */}
         <section className="py-32 bg-slate-50/50 dark:bg-slate-900/20">
           <div className="container mx-auto px-6">
             <div className="text-center max-w-3xl mx-auto mb-20">
@@ -760,7 +728,7 @@ export const Landing: React.FC = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* CTA Section - Final call-to-action */}
         <section className="py-24 md:py-40 relative">
           <div className="container mx-auto px-6 text-center relative z-10">
             <div className="max-w-5xl mx-auto bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[3rem] p-12 md:p-24 text-white shadow-2xl shadow-blue-600/30 overflow-hidden relative">
@@ -794,13 +762,14 @@ export const Landing: React.FC = () => {
         </section>
       </main>
 
+      {/* Footer - Site links and copyright */}
       <footer className="py-24 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
             <div className="md:col-span-2">
               <Logo size={32} className="mb-6" />
               <p className="text-slate-500 dark:text-slate-400 max-w-sm text-lg leading-relaxed">
-                The open-source workspace built for the next generation of knowledge workers. 
+                The open-source workspace built for the next generation of knowledge workers.
                 Simple, powerful, and privacy-first.
               </p>
             </div>
@@ -821,11 +790,11 @@ export const Landing: React.FC = () => {
               </ul>
             </div>
           </div>
-          
+
           <div className="flex flex-col md:flex-row justify-between items-center gap-8 pt-8 border-t border-slate-100 dark:border-slate-900">
             <div className="flex items-center gap-6">
-              <a 
-                href="https://github.com/fyiclub-vitb/WorkLin" 
+              <a
+                href="https://github.com/fyiclub-vitb/WorkLin"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
@@ -843,4 +812,3 @@ export const Landing: React.FC = () => {
     </div>
   );
 };
-
